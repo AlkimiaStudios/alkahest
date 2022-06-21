@@ -15,6 +15,8 @@ namespace Alkahest
             std::uint32_t size;
             void *end;
         };
+
+        inline std::size_t align(std::uint32_t n) { return (n + sizeof(std::size_t) - 1) & ~(sizeof(std::size_t) - 1); };
     }
 
     class API HeapAllocator
@@ -26,7 +28,6 @@ namespace Alkahest
         void *alloc(std::uint32_t size);
         void free(void *obj);
     private:
-        inline std::size_t align(std::uint32_t n) { return (n + sizeof(size_t) - 1) & ~(sizeof(std::size_t) - 1); };
         void *findAvailableSlot(std::uint32_t size);
     private:
         void *m_heap;
@@ -80,12 +81,12 @@ namespace Alkahest
          * @param size The maximum number of objects of type T to be held by
          *             the pool.
          */
-        PoolAllocator(std::uint32_t size) : m_size(size)
+        PoolAllocator(std::uint32_t size) : m_size(Memory::align(size))
         {
             AKST_ENG_ASSERT(size > 0, "Allocated size must be greater that zero!");
 
             // Allocate memory pool
-            m_pool = std::malloc(size * sizeof(T));
+            m_pool = std::malloc(Memory::align(size * sizeof(T)));
 
             // Load queue with available indices
             for (std::uint32_t i = 0; i < size; i++)

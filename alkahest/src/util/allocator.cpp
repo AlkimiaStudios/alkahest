@@ -3,11 +3,11 @@
 namespace Alkahest
 {
     HeapAllocator::HeapAllocator(std::uint32_t size)
-        : m_size(size)
+        : m_size(Memory::align(size))
     {
         AKST_ENG_ASSERT(size > 0, "Allocated size must be greater than zero!");
 
-        m_heap = std::malloc(align(size));
+        m_heap = std::malloc(Memory::align(size));
     }
 
     HeapAllocator::~HeapAllocator()
@@ -56,16 +56,16 @@ namespace Alkahest
     void *HeapAllocator::alloc(std::uint32_t size)
     {
         // Use align() to keep allocations aligned to buffer size
-        void *start = findAvailableSlot(align(size));
+        void *start = findAvailableSlot(Memory::align(size));
 
         // Create a chunk to log the allocation
         Memory::chunk c;
         c.start = start;
-        c.size = align(size);
+        c.size = Memory::align(size);
         c.end = static_cast<void*>(static_cast<char*>(c.start) + c.size);
         m_allocations.insert(std::pair<void*,Memory::chunk>(start, c));
 
-        logTrace("Allocated {} bytes from heap", align(size));
+        logTrace("Allocated {} bytes from heap", Memory::align(size));
         return start;
     }
 
@@ -80,11 +80,11 @@ namespace Alkahest
     }
 
     StackAllocator::StackAllocator(std::uint32_t size)
-        : m_size(size)
+        : m_size(Memory::align(size))
     {
         AKST_ENG_ASSERT(size > 0, "Allocated size must be greater than zero!");
 
-        m_stack = std::malloc(size);
+        m_stack = std::malloc(Memory::align(size));
         m_topMarker = 0;
     }
 
@@ -100,12 +100,12 @@ namespace Alkahest
 
     void *StackAllocator::alloc(std::uint32_t size)
     {
-        AKST_ENG_ASSERT(m_topMarker + size < m_size, \
+        AKST_ENG_ASSERT(m_topMarker + Memory::align(size) < m_size, \
             "Insufficient space to allocate bytes!");
 
         void *chunk = static_cast<void*>(static_cast<char*>(m_stack) \
                 + m_topMarker);
-        m_topMarker += size;
+        m_topMarker += Memory::align(size);
         return chunk;
     }
 
