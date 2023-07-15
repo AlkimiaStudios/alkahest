@@ -14,16 +14,7 @@
         inherit system;
         overlays = [ rust-overlay.overlays.default ];
       };
-      deps = with pkgs; [
-        rust-bin.stable.latest.default
-        cmake
-        gnumake
-        extra-cmake-modules
-        wayland
-        wayland-protocols
-        libxkbcommon
-      ];
-      code = pkgs.callPackage ./. { inherit pkgs system rust-overlay deps; };
+      code = pkgs.callPackage ./. { inherit pkgs system rust-overlay; };
     in rec {
       packages = {
         app = code.app;
@@ -31,7 +22,15 @@
       };
       devShells = {
         default = pkgs.mkShell {
-          buildinputs = deps;
+          buildInputs = with pkgs; [
+            rust-bin.stable.latest.default
+            cmake
+            gnumake
+            extra-cmake-modules
+            wayland
+            wayland-protocols
+            libxkbcommon
+          ];
         };
       };
     }
