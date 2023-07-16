@@ -2,6 +2,9 @@
 
 An open-source game engine written in Rust + OpenGL
 
+## Is it any good?
+[Yes.](https://news.ycombinator.com/item?id=3067434)
+
 ### License
 
 The Alkahest game engine is licensed under either of
