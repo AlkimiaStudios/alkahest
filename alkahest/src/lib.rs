@@ -14,6 +14,8 @@ extern crate log;
 pub use log::{trace, debug, info, warn, error};
 
 mod engine;
+mod systems;
+pub use systems::*;
 
 /// The Application trait allows the user to define their own game logic.
 ///
@@ -49,6 +51,14 @@ pub trait Application {
     fn should_close(&self) -> bool;
 }
 
+#[derive(Debug, Copy, Clone)]
+struct TestJob {}
+impl job_system::Job for TestJob {
+    fn run(&self, index: u32) {
+        debug!("Hello from job {}", index);
+    }
+}
+
 /// The run function.
 ///
 /// This function is the entrypoint for the game engine. This function should
@@ -57,15 +67,17 @@ pub trait Application {
 /// Application trait at the appropriate times.
 pub fn run<T>(app: &mut T) where T: Application {
     // Initialize engine first, then the app
-    engine::init();
+    let mut engine_context = engine::init();
     app.init();
+
+    engine_context.dispatch_jobs(100, 10, Box::new(TestJob{}));
 
     while !app.should_close() && !engine::should_close() {
         let timestep: f64 = 0.0;
-        engine::update(timestep);
+        engine::update(&mut engine_context, timestep);
         app.update(timestep);
     }
 
     app.cleanup();
-    engine::cleanup();
+    engine::cleanup(&mut engine_context);
 }
