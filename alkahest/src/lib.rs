@@ -9,6 +9,12 @@
 //! - [X] Game entrypoint
 //! - [ ] Window creation
 
+#[macro_use]
+extern crate log;
+pub use log::{trace, debug, info, warn, error};
+
+mod engine;
+
 /// The Application trait allows the user to define their own game logic.
 ///
 /// Logic is defined using the methods of the Application trait. These methods
@@ -50,11 +56,16 @@ pub trait Application {
 /// Application trait. The run function will then call the methods of the
 /// Application trait at the appropriate times.
 pub fn run<T>(app: &mut T) where T: Application {
+    // Initialize engine first, then the app
+    engine::init();
     app.init();
 
-    while !app.should_close() && true {
-        app.update(0.0);
+    while !app.should_close() && !engine::should_close() {
+        let timestep: f64 = 0.0;
+        engine::update(timestep);
+        app.update(timestep);
     }
 
     app.cleanup();
+    engine::cleanup();
 }

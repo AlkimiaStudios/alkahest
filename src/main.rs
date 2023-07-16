@@ -1,22 +1,23 @@
 use alkahest::{Application, run};
+use alkahest::trace;
 
 struct Game;
 
 impl Application for Game {
     fn init(&mut self) {
-        println!("Game::init()");
+        trace!("Game::init()");
     }
 
     fn update(&mut self, timestep: f64) {
-        println!("Game::update({})", timestep);
+        trace!("Game::update({})", timestep);
     }
 
     fn cleanup(&mut self) {
-        println!("Game::cleanup()");
+        trace!("Game::cleanup()");
     }
 
     fn should_close(&self) -> bool {
-        println!("Game::should_close()");
+        trace!("Game::should_close()");
         false
     }
 }
