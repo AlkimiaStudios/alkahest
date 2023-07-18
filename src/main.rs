@@ -8,8 +8,7 @@ impl Application for Game {
         trace!("Game::init()");
     }
 
-    fn update(&mut self, timestep: f64) {
-        trace!("Game::update({})", timestep);
+    fn update(&mut self, _timestep: f64) {
     }
 
     fn cleanup(&mut self) {
@@ -17,7 +16,6 @@ impl Application for Game {
     }
 
     fn should_close(&self) -> bool {
-        trace!("Game::should_close()");
         false
     }
 }
