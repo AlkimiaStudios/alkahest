@@ -18,7 +18,7 @@ mod systems;
 pub use systems::*;
 mod util;
 pub use util::error_handling::*;
-pub use util::message_bus::*;
+pub use util::messaging::*;
 
 /// The Application trait allows the user to define their own game logic.
 ///

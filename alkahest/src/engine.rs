@@ -23,7 +23,7 @@ pub(crate) fn init() -> EngineContext {
     }).expect("Error setting Ctrl-C handler");
 
     trace!("Initializing Message Bus...");
-    let bus = MessageBus::init();
+    let bus = MessageBus::new(1024);
 
     trace!("Initializing Alkahest systems...");
 
