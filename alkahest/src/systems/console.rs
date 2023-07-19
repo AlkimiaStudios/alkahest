@@ -1,5 +1,7 @@
 use flume::Sender;
-use crate::prelude::*;
+use super::System;
+use crate::trace;
+use crate::util::messaging::{Message, MessageBus};
 
 /// The ConsoleSystem struct.
 pub struct ConsoleSystem {

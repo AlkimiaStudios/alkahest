@@ -1,5 +1,4 @@
-use alkahest::{Application, run};
-use alkahest::trace;
+use alkahest::prelude::*;
 
 struct Game;
 
