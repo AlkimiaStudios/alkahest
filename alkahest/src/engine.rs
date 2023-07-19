@@ -2,56 +2,68 @@ use lazy_static::lazy_static;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use ctrlc;
-use crate::systems::console;
-use crate::MessageBus;
+use crate::prelude::*;
+use crate::systems::console::ConsoleSystem;
 
 lazy_static! {
     pub static ref RUNNING: Arc<AtomicBool> = Arc::new(AtomicBool::new(true));
 }
 
-#[derive(Debug)]
 pub(crate) struct EngineContext {
     message_bus: MessageBus,
+    console: ConsoleSystem,
 }
 
 pub(crate) fn init() -> EngineContext {
     // Initialize logger and handle keyboard interrupt
     env_logger::init();
     let r = RUNNING.clone();
-    ctrlc::set_handler(move || {
-        r.store(false, Ordering::SeqCst);
-    }).expect("Error setting Ctrl-C handler");
 
     trace!("Initializing Message Bus...");
-    let bus = MessageBus::new(1024);
+    let mut bus = MessageBus::new(Some(1024));
+    
+    // Register quit message handler
+    bus.register(handle_quit_message);
+    let s = bus.sender.clone();
+    ctrlc::set_handler(move || {
+        s.send(Message::Quit).unwrap();
+    }).expect("Error setting Ctrl-C handler");
 
     trace!("Initializing Alkahest systems...");
 
-    console::init(bus.clone());
+    let console = ConsoleSystem::init(&mut bus);
 
     trace!("Alkahest systems initialized.");
 
     EngineContext {
         message_bus: bus,
+        console,
     }
 }
 
 pub(crate) fn update(ctx: &mut EngineContext, _timestep: f64) {
-    ctx.send_message(crate::Message::Ping);
+    // Process all messages
+    ctx.message_bus.process_messages(1024);
+
+    // send ping test
+    trace!("Sending ping...");
+    ctx.message_bus.sender.send(Message::Ping).unwrap();
 }
 
 pub(crate) fn cleanup(ctx: &mut EngineContext) {
     trace!("Cleaning up Alkahest systems...");
+    ctx.console.cleanup();
 }
 
 pub(crate) fn should_close() -> bool {
     !RUNNING.load(Ordering::SeqCst)
 }
 
-impl EngineContext {
-    pub fn send_message(&self, msg: crate::Message) {
-        self.message_bus.sender.send(msg).map_err(|e| {
-            error!("Error sending message: {:?}", e);
-        }).ok();
+fn handle_quit_message(msg: Message) {
+    match msg {
+        Message::Quit => {
+            RUNNING.store(false, Ordering::SeqCst);
+        },
+        _ => {},
     }
 }

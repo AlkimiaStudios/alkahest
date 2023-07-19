@@ -1,8 +1,10 @@
 use flume::{bounded, unbounded, Receiver, Sender};
 
+pub type Callback = Box<dyn FnMut(Message)>;
+
+#[derive(Debug, Clone, Copy)]
 pub enum Message {
     Quit,
-    Register(Box<dyn Fn>),
     Ping,
 }
 
@@ -10,9 +12,9 @@ unsafe impl Send for Message {}
 unsafe impl Sync for Message {}
 
 pub struct MessageBus {
-    sender: Sender<Message>,
+    pub sender: Sender<Message>,
     receiver: Receiver<Message>,
-    targets: Vec<Box<dyn Fn>>,
+    targets: Vec<Callback>,
 }
 
 impl MessageBus {
@@ -25,20 +27,13 @@ impl MessageBus {
         Self { sender, receiver, targets: vec![] }
     }
 
-    pub fn register(&mut self, callback: Box<dyn Fn>) {
-        self.targets.push(callback);
+    pub fn register(&mut self, callback: impl FnMut(Message) + 'static) {
+        self.targets.push(Box::new(callback));
     }
 
-    pub fn process_messages(&self, limit: usize) {
-        while let Ok(msg) = self.receiver.recv() {
-            todo!();
-        }
-    }
-
-    fn handle_message(&mut msg: Message) {
-        match msg {
-            Message::Register(func) => self.register(func),
-            _ => (),
+    pub fn process_messages(&mut self, limit: usize) {
+        for msg in self.receiver.try_iter().take(limit) {
+            self.targets.iter_mut().for_each(|f| f(msg));
         }
     }
 }

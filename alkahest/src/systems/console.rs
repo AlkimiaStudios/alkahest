@@ -1,11 +1,22 @@
-use crate::{MessageBus, trace};
+use flume::Sender;
+use crate::prelude::*;
 
-
-pub async fn init(bus: MessageBus) {
-    while let Ok(msg) = bus.receiver.recv_async().await {
-        trace!("{:?}", msg);
-    }
+pub struct ConsoleSystem {
+    bus: Sender<Message>,
 }
 
-pub fn cleanup() {
+fn handle_message(msg: Message) {
+    trace!("{:?}", msg);
+}
+
+impl System for ConsoleSystem {
+    fn init(bus: &mut MessageBus) -> Self {
+        let sender = bus.sender.clone();
+        bus.register(handle_message);
+        Self { bus: sender }
+    }
+
+    fn cleanup(&mut self) {
+        drop(self.bus.clone());
+    }
 }

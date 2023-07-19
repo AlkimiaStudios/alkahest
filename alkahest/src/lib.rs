@@ -9,16 +9,14 @@
 //! - [X] Game entrypoint
 //! - [ ] Window creation
 
-#[macro_use]
 extern crate log;
 pub use log::{trace, debug, info, warn, error};
 
+pub mod prelude;
+
 mod engine;
 mod systems;
-pub use systems::*;
 mod util;
-pub use util::error_handling::*;
-pub use util::messaging::*;
 
 /// The Application trait allows the user to define their own game logic.
 ///

@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex, Condvar};
 use std::sync::atomic::{AtomicBool, Ordering, AtomicU64};
-use crate::{trace, error};
+use crate::prelude::*;
 
 // We compare these two values to know if we have completed all dispatched jobs
 static mut CURRENT_LABEL: u64 = 0;
