@@ -25,3 +25,4 @@ image = "*"
 
 [features]
 wayland = ["glfw/wayland"]
+profiling = []

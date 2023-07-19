@@ -12,5 +12,6 @@ serde_derive = "*"
 toml = "*"
 
 [features]
-default = ["wayland"]
+default = ["wayland", "profiling"]
 wayland = ["alkahest/wayland"]
+profiling = ["alkahest/profiling"]

@@ -49,8 +49,10 @@ pub(crate) fn init() -> EngineContext {
 
 /// Update all engine systems
 pub(crate) fn update(ctx: &mut EngineContext, timestep: f64) {
-    // Process all messages
-    ctx.message_bus.process_messages(1024);
+    profile! (ProcessMessages, {
+        // Process all messages
+        ctx.message_bus.process_messages(1024);
+    });
 
     ctx.message_bus.sender.send(Message::Update(timestep)).unwrap();
 }
