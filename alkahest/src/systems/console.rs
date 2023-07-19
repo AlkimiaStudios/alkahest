@@ -1,6 +1,7 @@
 use flume::Sender;
 use crate::prelude::*;
 
+/// The ConsoleSystem struct.
 pub struct ConsoleSystem {
     bus: Sender<Message>,
 }

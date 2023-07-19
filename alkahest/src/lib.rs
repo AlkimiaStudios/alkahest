@@ -12,10 +12,14 @@
 extern crate log;
 pub use log::{trace, debug, info, warn, error};
 
+/// Commonly used types and traits.
 pub mod prelude;
 
+/// The core engine.
 mod engine;
+/// The systems that make up the engine.
 mod systems;
+/// Utility functions.
 mod util;
 
 /// The Application trait allows the user to define their own game logic.

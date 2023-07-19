@@ -31,6 +31,9 @@
             wayland-protocols
             libxkbcommon
           ];
+          shellHook = ''
+            export RUST_LOG=trace
+          '';
         };
       };
     }
