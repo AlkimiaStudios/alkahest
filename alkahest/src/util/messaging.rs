@@ -6,6 +6,7 @@ pub type Callback = Box<dyn FnMut(Message)>;
 pub enum Message {
     Quit,
     Ping,
+    Update(f64),
 }
 
 unsafe impl Send for Message {}

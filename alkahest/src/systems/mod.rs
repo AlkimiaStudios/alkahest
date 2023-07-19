@@ -1,5 +1,4 @@
 use crate::util::messaging::MessageBus;
-use flume::Sender;
 
 pub mod console;
 pub mod job_system;

@@ -17,7 +17,6 @@ pub(crate) struct EngineContext {
 pub(crate) fn init() -> EngineContext {
     // Initialize logger and handle keyboard interrupt
     env_logger::init();
-    let r = RUNNING.clone();
 
     trace!("Initializing Message Bus...");
     let mut bus = MessageBus::new(Some(1024));
@@ -41,13 +40,11 @@ pub(crate) fn init() -> EngineContext {
     }
 }
 
-pub(crate) fn update(ctx: &mut EngineContext, _timestep: f64) {
+pub(crate) fn update(ctx: &mut EngineContext, timestep: f64) {
     // Process all messages
     ctx.message_bus.process_messages(1024);
 
-    // send ping test
-    trace!("Sending ping...");
-    ctx.message_bus.sender.send(Message::Ping).unwrap();
+    ctx.message_bus.sender.send(Message::Update(timestep)).unwrap();
 }
 
 pub(crate) fn cleanup(ctx: &mut EngineContext) {

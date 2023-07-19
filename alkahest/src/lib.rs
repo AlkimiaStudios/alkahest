@@ -59,14 +59,22 @@ pub trait Application {
 /// Application trait. The run function will then call the methods of the
 /// Application trait at the appropriate times.
 pub fn run<T>(app: &mut T) where T: Application {
+    use util::timestep::Time;
+
     // Initialize engine first, then the app
     let mut engine_context = engine::init();
     app.init();
 
     while !app.should_close() && !engine::should_close() {
-        let timestep: f64 = 0.0;
+        // Grab the delta time since last frame start
+        let timestep = Time::delta();
+
+        // Process updates
         engine::update(&mut engine_context, timestep);
         app.update(timestep);
+
+        // Update the time
+        Time::update();
     }
 
     app.cleanup();
